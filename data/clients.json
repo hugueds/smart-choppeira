@@ -1,0 +1,28 @@
+[
+    {
+        "id": 0,
+        "name": "Hugo Peres",
+        "balance": 1000,
+        "cardId": 0,
+        "lastLogin": "00:00:00 00/00/0000",
+        "memberSince": "00/00/0000"
+    },
+    {
+        "id": 1,
+        "name": "João Batista",
+        "balance": 1000,
+        "cardId": 1
+    },
+    {
+        "id": 2,
+        "name": "José",
+        "balance": 1000,
+        "cardId": 2
+    },
+    {
+        "id": 3,
+        "name": "Joaquim",
+        "balance": 1000,
+        "cardId": 3
+    }
+]

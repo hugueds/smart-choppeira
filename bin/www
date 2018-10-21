@@ -1,0 +1,53 @@
+#!/usr/bin node
+
+require('console-stamp')(console, '[dd/mm HH:MM:ss.l]');
+const dotenv = require('dotenv').config();
+const app = require('../app');
+const http = require('http');
+const SocketServer = require('../socketServer');
+const mqttClient = require('../mqtt');
+const messageHandler = require('../messageHandler');
+const readline = require('readline');
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+rl.on('line', (text) =>  console.log(`Read Line ${text}`))
+
+const port = getPort();
+const server = http.createServer(app);
+
+const socket = SocketServer().start(server);
+
+messageHandler.register(mqttClient, socket);
+
+server.listen(port);
+server.on('listening', onListening);
+server.on('error', onError);
+
+function onListening() {
+    console.log('Server connected at port ', port)
+}
+
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+    console.error(error.code);
+    process.exit(1);
+}
+
+function getPort() {
+    let port = 0;
+    if (process.env.NODE_ENV == 'production') {
+        port = process.env.PORT;
+    } else {
+        port = process.env.DEV_PORT;
+    }
+    return parseInt(port, 10);
+}
+
+
+module.export = http;

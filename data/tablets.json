@@ -1,0 +1,23 @@
+[
+    {
+        "id": 0,
+        "address": "192.168.0.3",
+        "partnerId": 0,
+        "obs": "Tablet é o mesmo que o cliente do browser, partner é o Raspberry com o sensor"
+    },
+    {
+        "id": 1,
+        "address": "192.168.0.16",
+        "partnerId": 0
+    },
+    {
+        "id": 2,
+        "address": "192.168.0.4",
+        "partnerId": 2
+    },
+	{
+        "id": 3,
+        "address": "10.251.11.152",
+        "partnerId": 0
+    }
+]

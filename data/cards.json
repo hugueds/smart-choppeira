@@ -1,0 +1,22 @@
+[
+    {
+        "id": 0,
+        "number": "123",
+        "externalNumber": "123 456 789"
+    },
+    {
+        "id": 1,
+        "number": "000",        
+        "externalNumber": "000 000 000"
+    },
+    {
+        "id": 2,
+        "number": "111",        
+        "externalNumber": "111 111 111"
+    },
+    {
+        "id": 3,
+        "number": "222",        
+        "externalNumber": "222 222 222"
+    }
+]

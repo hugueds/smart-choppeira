@@ -1,0 +1,28 @@
+{
+  "name": "smart-choppeira",
+  "version": "1.0.0",
+  "description": "",
+  "main": "bin/www",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/hugueds/smart-choppeira.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/hugueds/smart-choppeira/issues"
+  },
+  "homepage": "https://github.com/hugueds/smart-choppeira#readme",
+  "dependencies": {
+    "console-stamp": "^0.2.6",
+    "dotenv": "^5.0.1",
+    "express": "^4.16.2",
+    "mqtt": "^2.16.0",
+    "nodemon": "^1.17.1",
+    "npm": "^5.7.1",
+    "socket.io": "^2.0.4"
+  }
+}

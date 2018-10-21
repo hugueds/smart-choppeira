@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div id="main-screen">
+        <h1>CHOPEIRA DO JOÃO</h1>
+        <h2>Bem vindo à chopeira do João</h2>
+        <h2>Para iniciar aproxime seu cartão do leitor</h2>
+        <!-- Imagem apontando para o leitor -->
+    </div>
+
+    <div id="error-panel">
+        <h2 id="error-message"></h2>
+    </div>
+
+    <div id="client-info">
+        <div>
+            <h2>BEM VINDO</h2>
+            <span id="client-name"></span>
+        </div>
+
+        <div>
+            <h2>Cartão:</h2>
+            <span id="client-cardnumber"></span>
+        </div>
+
+        <div>
+            <h2>Saldo:</h2>
+            <span id="client-balance"></span>
+        </div>
+
+        <div>
+            <h2>Ultimo Login:</h2>
+            <span id="client-lastlogin"></span>
+        </div>
+
+        <div>
+            <h2>Membro desde:</h2>
+            <span id="client-membersince"></span>
+        </div>
+
+        <div>
+            <div id="button-wrapper">
+                <button onclick="endSession()">FINALIZAR SESSÃO</button>
+            </div>
+        </div>
+
+        <div>
+            <div>TIMER</div>
+            <span id="logged-timer">0</span>
+        </div>
+
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script>
+        var socket = io();
+        var tablet = null;
+        var client = null;
+        var card = null;
+        var logged = false;
+        var session = null;
+
+        var mainDiv = null;
+        var loggedDiv = null;
+
+        var loginTime = 60000; // 1 minuto
+        var loggedTime = 0;
+        var lockTimer = false;
+
+        window.onload = function () {
+            // Apresenta tela inicial
+            mainDiv = document.querySelector('#main-screen');
+            mainDiv.style.display = 'block';
+            loggedDiv = document.querySelector('#client-info');
+            loggedDiv.style.display = 'none';
+            // Cancela a sessão associada ao dispositivo
+            // Verifica se tablet já possui sua identificação em localStorage
+        }
+
+        socket.on('connect', function () {
+            console.log('Socket Connected');
+
+
+            // Inicia temporizador para deslogar automático, necessita verificar falta de interação        
+            var interval = setInterval(() => {
+
+                if (!logged) {
+                    loggedTime = 0;
+                    clearInterval(interval);
+                    return;
+                }
+
+                if (loggedTime >= loginTime && logged) {
+                    window.location.reload();                    
+                } else {
+                    loggedTime += 1000;
+                    document.querySelector('#logged-timer').innerText = (loginTime - loggedTime) / 1000;
+                }
+            }, 1000)
+        });
+
+        socket.on('disconnect', function () {
+            // Exibe mensagem de erro dizendo que houve perda na conexão
+            console.log('Socket Disconected');
+        });
+
+        socket.on('new connection', function (data, s_tablet) {            
+            tablet = s_tablet;
+            localStorage.setItem('tablet', JSON.stringify(s_tablet));
+            console.log(data);
+        });
+
+        socket.on('update balance', function (deviceId, s_session) {
+            session = s_session;
+            if (deviceId == tablet.partnerId) {
+                session.client.balance = session.client.balance <= 0 ? 0 : session.client.balance;
+                document.getElementById('client-balance').innerText = session.client.balance; // Converter para real
+            }
+        });
+
+        socket.on('cardreader', function (deviceId, s_card, s_client) {
+            if (!s_card || !s_client) {
+                clearClientInfo();
+                showErrorMessage('Cartão não localizado');
+                // Exibe mensagem de erro para o usuário
+                return;
+            }
+            card = s_card;
+            client = s_client;
+            console.log('Cartão numero: ' + card.number + ' foi lido');
+            console.log('Cliente: ', client);
+            if (deviceId == tablet.partnerId) {
+                // Exibição erro caso saldo caso esteja negativo ou baixo
+                mainDiv.style.display = 'none';
+                loggedDiv.style.display = 'block';
+                logged = true;
+                document.getElementById('button-wrapper').style.display = 'block';
+                document.getElementById('error-panel').style.display = 'none';
+                document.getElementById('client-name').innerText = client.name;
+                document.getElementById('client-cardnumber').innerText = card.externalNumber;
+                document.getElementById('client-balance').innerText = client.balance;
+                document.getElementById('client-lastlogin').innerText = client.lastLogin;
+                document.getElementById('client-membersince').innerText = client.memberSince;
+            }
+        });
+
+        socket.on('mqtt', function (data) {
+            let element = document.getElementById('mqtt-data');
+            let enc = new TextDecoder();
+            let decodedText = enc.decode(data);
+            element.innerText = decodedText;
+            console.log(decodedText);
+        });
+
+        socket.on('reload', function () {
+            console.log('Reloading page...');
+            location.reload();
+        });
+
+        function clearClientInfo() {
+            logged = false;
+            document.getElementById('button-wrapper').style.display = 'none';
+            document.getElementById('client-name').innerText = ''
+            document.getElementById('client-cardnumber').innerText = '';
+            document.getElementById('client-balance').innerText = '';
+            document.getElementById('client-lastlogin').innerText = '';
+            document.getElementById('client-membersince').innerText = '';
+        }
+
+        function showErrorMessage(message) {
+            document.getElementById('error-panel').style.display = 'block';
+            document.getElementById('error-message').innerHTML = message;
+        }
+
+        function endSession() {
+            logged = false;
+            mainDiv.style.display = 'block';
+            loggedDiv.style.display = 'none';
+            
+            console.log('Finalizando sessão');
+            // socket.emit('end-session', session.client);
+            clearClientInfo();
+            window.location.reload();
+        }
+
+    </script>
+
+
+</body>
+
+</html>
